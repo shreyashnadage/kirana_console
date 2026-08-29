@@ -186,9 +186,15 @@ def sync_prices(products: list) -> dict:
 
 
 def sync_customers(customers: list) -> dict:
+	# The document name needs the "[ERP-1301]" suffix to stay unique (two
+	# shops can share a business name), but that suffix must never leak into
+	# anything customer-facing (storefront greeting, admin lists) - it broke
+	# exactly that way once already. So: insert/lookup by the suffixed name,
+	# then force customer_name back to the clean display name immediately.
 	ok, failed = 0, 0
 	for c in customers:
-		cust_name = f"{c['CUST_NAME']} [ERP-{c['CUST_ID']}]"[:140]
+		display_name = c["CUST_NAME"][:140]
+		cust_name = f"{display_name} [ERP-{c['CUST_ID']}]"[:140]
 		payload = {
 			"customer_group": DEFAULT_CUSTOMER_GROUP, "territory": DEFAULT_TERRITORY,
 			"customer_type": "Individual", "default_currency": DEFAULT_CURRENCY,
@@ -199,10 +205,12 @@ def sync_customers(customers: list) -> dict:
 		try:
 			if frappe.db.exists("Customer", cust_name):
 				frappe.db.set_value("Customer", cust_name, payload, update_modified=False)
+				frappe.db.set_value("Customer", cust_name, "customer_name", display_name, update_modified=False)
 			else:
 				frappe.get_doc({
 					"doctype": "Customer", "customer_name": cust_name, **payload,
 				}).insert(ignore_permissions=True)
+				frappe.db.set_value("Customer", cust_name, "customer_name", display_name, update_modified=False)
 			ok += 1
 		except Exception:
 			failed += 1
