@@ -6,6 +6,8 @@ app_email = "admin@example.com"
 app_license = "Proprietary"
 required_apps = ["frappe", "erpnext", "webshop"]
 
+app_include_js = ["/assets/kirana_console/js/hide_nav.js"]
+
 # Fixtures: exporting these means `bench install-app kirana_console` on a
 # brand new stockist site provisions the whole admin console automatically -
 # no manual re-clicking through the API like we did for the first site.
