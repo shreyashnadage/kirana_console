@@ -13,8 +13,12 @@ fixtures = [
 	{"dt": "Module Profile", "filters": [["name", "=", "Stockist Admin"]]},
 	{"dt": "Server Script", "filters": [["name", "like", "Stockist %"]]},
 	{"dt": "Custom HTML Block", "filters": [["name", "like", "Stockist %"]]},
-	{"dt": "Workspace", "filters": [["name", "=", "Stockist Dashboard"]]},
-	{"dt": "Custom Field", "filters": [["name", "=", "Customer-legacy_due_amount"]]},
+	{"dt": "Workspace", "filters": [["name", "in", [
+		"Stockist Dashboard", "Customer Access", "Products Manager", "Marketing",
+	]]]},
+	{"dt": "Custom Field", "filters": [["name", "in", [
+		"Customer-legacy_due_amount", "Item-admin_overridden",
+	]]]},
 	{"dt": "Role", "filters": [["name", "in", ["Customer"]]]},
 ]
 

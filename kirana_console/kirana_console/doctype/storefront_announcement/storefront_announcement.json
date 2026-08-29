@@ -1,0 +1,88 @@
+{
+  "doctype": "DocType",
+  "name": "Storefront Announcement",
+  "module": "Kirana Console",
+  "custom": 0,
+  "engine": "InnoDB",
+  "autoname": "field:title",
+  "field_order": [
+    "title",
+    "announcement_type",
+    "message",
+    "column_break_1",
+    "is_active",
+    "start_date",
+    "end_date",
+    "link_url",
+    "image"
+  ],
+  "fields": [
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "label": "Title",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "announcement_type",
+      "fieldtype": "Select",
+      "label": "Type",
+      "options": "Banner\nRunning Sticker\nPopup",
+      "default": "Banner",
+      "reqd": 1
+    },
+    {
+      "fieldname": "message",
+      "fieldtype": "Small Text",
+      "label": "Message",
+      "reqd": 1
+    },
+    {
+      "fieldname": "column_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "is_active",
+      "fieldtype": "Check",
+      "label": "Active",
+      "description": "Turn this on/off anytime - independent of the dates below."
+    },
+    {
+      "fieldname": "start_date",
+      "fieldtype": "Date",
+      "label": "Start Date"
+    },
+    {
+      "fieldname": "end_date",
+      "fieldtype": "Date",
+      "label": "End Date"
+    },
+    {
+      "fieldname": "link_url",
+      "fieldtype": "Data",
+      "label": "Link (optional)"
+    },
+    {
+      "fieldname": "image",
+      "fieldtype": "Attach Image",
+      "label": "Image (optional)"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "Sales Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    }
+  ]
+}
