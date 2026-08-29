@@ -1,0 +1,64 @@
+{
+  "doctype": "DocType",
+  "name": "Kirana Console Settings",
+  "module": "Kirana Console",
+  "issingle": 1,
+  "custom": 0,
+  "engine": "InnoDB",
+  "field_order": [
+    "erp_section",
+    "erp_base_url",
+    "erp_username",
+    "erp_password",
+    "column_break_erp",
+    "last_synced",
+    "last_sync_summary"
+  ],
+  "fields": [
+    {
+      "fieldname": "erp_section",
+      "fieldtype": "Section Break",
+      "label": "Legacy ERP Connection"
+    },
+    {
+      "fieldname": "erp_base_url",
+      "fieldtype": "Data",
+      "label": "Legacy ERP Base URL",
+      "description": "e.g. https://logibitsoftware.com/VADGAVE"
+    },
+    {
+      "fieldname": "erp_username",
+      "fieldtype": "Data",
+      "label": "Legacy ERP Username"
+    },
+    {
+      "fieldname": "erp_password",
+      "fieldtype": "Password",
+      "label": "Legacy ERP Password"
+    },
+    {
+      "fieldname": "column_break_erp",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "last_synced",
+      "fieldtype": "Datetime",
+      "label": "Last Synced",
+      "read_only": 1
+    },
+    {
+      "fieldname": "last_sync_summary",
+      "fieldtype": "Small Text",
+      "label": "Last Sync Summary",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ]
+}

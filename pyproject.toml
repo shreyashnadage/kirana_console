@@ -1,0 +1,18 @@
+[project]
+name = "kirana_console"
+authors = [
+    { name = "Kirana App" }
+]
+description = "Simplified stockist admin console and legacy ERP sync engine, built on Frappe/ERPNext/Webshop."
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    "requests",
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.dev-dependencies]
