@@ -32,6 +32,9 @@ fixtures = [
 	{"dt": "Custom DocPerm", "filters": [["parent", "in", [
 		"Item", "Account", "Sales Order", "Website Item", "Kirana Console Settings",
 	]]]},
+	# Marathi (and future language) translations for the storefront chrome -
+	# see kirana_console.i18n and sync/seed_marathi_translations*.py.
+	{"dt": "Translation", "filters": [["language", "=", "mr"]]},
 ]
 
 # Scheduled sync - runs the legacy ERP pull automatically as a safety net,
