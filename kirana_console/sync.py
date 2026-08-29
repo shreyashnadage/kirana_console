@@ -129,6 +129,11 @@ def sync_items(products: list) -> dict:
 		}
 		try:
 			if frappe.db.exists("Item", item_code):
+				if frappe.db.get_value("Item", item_code, "admin_overridden"):
+					# Stockist has manually edited this item's details/price
+					# via the Products tab - don't clobber it on re-sync.
+					ok += 1
+					continue
 				# Some Item fields (gst_hsn_code, etc.) aren't plain columns -
 				# frappe.db.set_value's raw SQL breaks on them. Load+save
 				# routes through Frappe's real field handling instead.
@@ -167,6 +172,9 @@ def sync_prices(products: list) -> dict:
 		item_code = f"ERP-{p['PROD_ID']}"
 		rate = p.get("RATE") or 0
 		if rate <= 0:
+			continue
+		if frappe.db.get_value("Item", item_code, "admin_overridden"):
+			ok += 1
 			continue
 		try:
 			existing = frappe.db.get_value(
