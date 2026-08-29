@@ -7,6 +7,21 @@
 // grid at /desk and /app loads a lighter bundle where frappe.ready isn't
 // defined yet when this script executes.
 (function () {
+	// Brand the sidebar workspace-header icon (top-left, next to the
+	// current workspace name) with Amol's logo instead of the generic
+	// grey fallback glyph. Workspace.icon is a fixed icon-picker field,
+	// not an arbitrary image, so there's no Settings field for this -
+	// applies for every Desk user, System Manager included.
+	var style = document.createElement("style");
+	style.textContent =
+		".header-logo .icon-container {" +
+		"  background-image: url(/files/amol-vadgaon-logo.jpg);" +
+		"  background-size: cover;" +
+		"  background-position: center;" +
+		"}" +
+		".header-logo .icon-container svg { display: none; }";
+	document.head.appendChild(style);
+
 	function isSystemManager() {
 		try {
 			if (window.frappe && frappe.user_roles) {
