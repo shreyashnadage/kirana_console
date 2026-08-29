@@ -17,11 +17,21 @@ fixtures = [
 	{"dt": "Custom HTML Block", "filters": [["name", "like", "Stockist %"]]},
 	{"dt": "Workspace", "filters": [["name", "in", [
 		"Stockist Dashboard", "Customer Access", "Products Manager", "Marketing",
+		"Order Management",
 	]]]},
 	{"dt": "Custom Field", "filters": [["name", "in", [
 		"Customer-legacy_due_amount", "Item-admin_overridden",
 	]]]},
 	{"dt": "Role", "filters": [["name", "in", ["Customer"]]]},
+	# Custom DocPerm additions layered on top of stock ERPNext doctypes -
+	# both the Customer-role grants (portal storefront needs) and the
+	# Desk-role grants for Amol's roles that would otherwise be silently
+	# dropped the moment ANY Custom DocPerm row exists for a doctype (see
+	# sync/fix_*_permission_for_customer.py and
+	# sync/fix_sales_order_permission_for_customer.py for the full story).
+	{"dt": "Custom DocPerm", "filters": [["parent", "in", [
+		"Item", "Account", "Sales Order", "Website Item", "Kirana Console Settings",
+	]]]},
 ]
 
 # Scheduled sync - runs the legacy ERP pull automatically as a safety net,

@@ -2,7 +2,7 @@
 	"name": "Amol Vadgaon Enterprises",
 	"short_name": "Vadgaon Store",
 	"description": "Order groceries and supplies from Amol Vadgaon Enterprises",
-	"start_url": "/all-products?source=pwa",
+	"start_url": "/?source=pwa",
 	"scope": "/",
 	"display": "standalone",
 	"orientation": "portrait",

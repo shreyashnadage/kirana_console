@@ -5,11 +5,12 @@
 // without at least trying the network first), with an offline fallback
 // page for full-page navigations when there's no network and no cache.
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v3";
 const STATIC_CACHE = "vadgaon-static-" + CACHE_VERSION;
 const RUNTIME_CACHE = "vadgaon-runtime-" + CACHE_VERSION;
 
 const APP_SHELL = [
+	"/welcome",
 	"/all-products",
 	"/offline",
 	"/assets/kirana_console/icons/icon-192.png",
@@ -92,9 +93,15 @@ self.addEventListener("fetch", function (event) {
 		event.respondWith(
 			fetch(req)
 				.then(function (res) {
-					caches.open(RUNTIME_CACHE).then(function (cache) {
-						cache.put(req, res.clone());
-					});
+					// Only a real, successful page gets cached - caching a 404
+					// or 5xx here would mean a page that starts working again
+					// (or never should have 404'd - a permission fix, a typo
+					// fix) keeps serving the broken response from cache.
+					if (res && res.ok) {
+						caches.open(RUNTIME_CACHE).then(function (cache) {
+							cache.put(req, res.clone());
+						});
+					}
 					return res;
 				})
 				.catch(function () {
