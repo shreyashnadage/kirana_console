@@ -129,15 +129,17 @@ def sync_items(products: list) -> dict:
 		}
 		try:
 			if frappe.db.exists("Item", item_code):
-				frappe.db.set_value("Item", item_code, payload, update_modified=False)
-				if uoms:
-					item = frappe.get_doc("Item", item_code)
-					existing_uoms = {u.uom for u in item.uoms}
-					for u in uoms:
-						if u["uom"] not in existing_uoms:
-							item.append("uoms", u)
-					item.flags.ignore_permissions = True
-					item.save(ignore_permissions=True)
+				# Some Item fields (gst_hsn_code, etc.) aren't plain columns -
+				# frappe.db.set_value's raw SQL breaks on them. Load+save
+				# routes through Frappe's real field handling instead.
+				item = frappe.get_doc("Item", item_code)
+				item.update(payload)
+				existing_uoms = {u.uom for u in item.uoms}
+				for u in uoms:
+					if u["uom"] not in existing_uoms:
+						item.append("uoms", u)
+				item.flags.ignore_permissions = True
+				item.save(ignore_permissions=True)
 			else:
 				doc = {
 					"doctype": "Item", "item_code": item_code,
@@ -146,10 +148,11 @@ def sync_items(products: list) -> dict:
 				frappe.get_doc(doc).insert(ignore_permissions=True)
 
 			if item_code in wi_map:
-				frappe.db.set_value(
-					"Website Item", wi_map[item_code],
-					{"item_group": cat, "brand": brand}, update_modified=False,
-				)
+				wi = frappe.get_doc("Website Item", wi_map[item_code])
+				wi.item_group = cat
+				wi.brand = brand
+				wi.flags.ignore_permissions = True
+				wi.save(ignore_permissions=True)
 			ok += 1
 		except Exception:
 			failed += 1
@@ -204,13 +207,21 @@ def sync_customers(customers: list) -> dict:
 		}
 		try:
 			if frappe.db.exists("Customer", cust_name):
-				frappe.db.set_value("Customer", cust_name, payload, update_modified=False)
-				frappe.db.set_value("Customer", cust_name, "customer_name", display_name, update_modified=False)
+				# credit_limit lives in a child table, not a plain column -
+				# db.set_value's raw SQL breaks on it. Load+save instead.
+				cust = frappe.get_doc("Customer", cust_name)
+				cust.update(payload)
+				cust.customer_name = display_name
+				cust.flags.ignore_permissions = True
+				cust.save(ignore_permissions=True)
 			else:
-				frappe.get_doc({
+				doc = frappe.get_doc({
 					"doctype": "Customer", "customer_name": cust_name, **payload,
-				}).insert(ignore_permissions=True)
-				frappe.db.set_value("Customer", cust_name, "customer_name", display_name, update_modified=False)
+				})
+				doc.insert(ignore_permissions=True)
+				doc.customer_name = display_name
+				doc.flags.ignore_permissions = True
+				doc.save(ignore_permissions=True)
 			ok += 1
 		except Exception:
 			failed += 1
