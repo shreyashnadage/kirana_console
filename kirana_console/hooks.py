@@ -6,7 +6,26 @@ app_email = "admin@example.com"
 app_license = "Proprietary"
 required_apps = ["frappe", "erpnext", "webshop"]
 
-app_include_js = ["/assets/kirana_console/js/hide_nav.js"]
+# The ?v= query string is a manual cache-buster - this file gets live-patched
+# in place (no content-hashed filename), so browsers/CDNs will happily keep
+# serving stale bytes under the same URL forever otherwise. Bump it on every
+# deploy of hide_nav.js.
+app_include_js = ["/assets/kirana_console/js/hide_nav.js?v=7"]
+
+# doctype_js loads only on that doctype's own form, unlike app_include_js
+# above which loads everywhere - appropriate here since the Connect
+# WhatsApp button only makes sense on the Settings form itself. Unlike
+# app_include_js, this is NOT a URL - Frappe resolves it as a literal
+# filesystem path (frappe.get_app_path + frappe.read_file) and inlines the
+# file's content into the DocType meta's __js field server-side, so a
+# ?v= cache-buster suffix here breaks the path lookup entirely rather than
+# busting a cache. Cache invalidation for this hook is bench clear-cache,
+# not a query string.
+doctype_js = {
+	"Kirana Console Settings": "public/js/whatsapp_connect.js",
+	"WhatsApp Video Drop": "public/js/whatsapp_video_drop.js",
+	"Stockist Offer": "public/js/stockist_offer.js",
+}
 
 # Fixtures: exporting these means `bench install-app kirana_console` on a
 # brand new stockist site provisions the whole admin console automatically -
