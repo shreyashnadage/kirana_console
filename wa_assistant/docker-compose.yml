@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-wa_assistant}
+      POSTGRES_USER: ${POSTGRES_USER:-wa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wa} -d ${POSTGRES_DB:-wa_assistant}"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  neonize:
+    build:
+      context: ./neonize_daemon
+      dockerfile: Dockerfile
+    environment:
+      BACKEND_URL: http://backend:8000
+    volumes:
+      - neonize_session:/app/session   # persists WA multi-device auth
+    ports:
+      - "9999:9999"    # QR endpoint — expose only on localhost in prod (use SSH tunnel)
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-wa}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-wa_assistant}
+      REDIS_URL: redis://redis:6379/0
+      NEONIZE_URL: http://neonize:9999
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in .env}
+      SARVAM_API_KEY: ${SARVAM_API_KEY:?set SARVAM_API_KEY in .env}
+      OWNER_WA_JID: ${OWNER_WA_JID:?set OWNER_WA_JID in .env}
+      ASSISTANT_WA_JID: ${ASSISTANT_WA_JID:-}
+      BRIEF_TIME_UTC: ${BRIEF_TIME_UTC:-03:30}
+      DAILY_COST_CEILING_USD: ${DAILY_COST_CEILING_USD:-2.00}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  neonize_session:
